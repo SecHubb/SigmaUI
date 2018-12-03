@@ -1,0 +1,30 @@
+version: '3'
+
+networks:
+  sigmaui-network:
+    driver: bridge
+
+services:
+  elasticsearch:
+    image: "docker.elastic.co/elasticsearch/elasticsearch-oss:6.3.0"
+    networks:
+     - sigmaui-network
+    ports:
+    - "9200:9200"
+    - "9300"
+    environment:
+      discovery.type: single-node
+      ES_JAVA_OPTS: -Xms256m -Xmx256m
+    restart: on-failure
+
+  kibana-sigmaui:
+    image: "kibana-sigmaui:v1"
+    networks:
+     - sigmaui-network
+    ports:
+     - "5601:5601"
+    environment:
+      ELASTICSEARCH_URL: http://elasticsearch-6:9200
+    depends_on:
+     - elasticsearch
+    restart: on-failure
